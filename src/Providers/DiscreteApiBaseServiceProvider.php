@@ -73,7 +73,7 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
             $this->publishes([
                 realpath(__DIR__.'/../../database/migrations') => base_path('database/migrations'),
                 realpath(__DIR__.'/../../lang') => lang_path('vendor/discreteapibase'),
-                realpath(__DIR__.'/../../stubs/User.php.stub') => app_path('/Models/User.php')
+                realpath(__DIR__.'/../../stubs/User.php') => app_path('/Models/User.php')
             ], 'discreteapibase-install');
 
             $this->publishes([
@@ -85,7 +85,7 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
             ], 'discreteapibase-lang');
 
             $this->publishes([
-                realpath(__DIR__.'/../../stubs/User.php.stub') => app_path('/Models/User.php')
+                realpath(__DIR__.'/../../stubs/User.php') => app_path('/Models/User.php')
             ], 'discreteapibase-models');
 
         }
