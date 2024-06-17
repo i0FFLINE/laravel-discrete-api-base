@@ -31,7 +31,11 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(mixed $notifiable): MailMessage
     {
-        $url = url(config('discreteapibase.frontend_url') . '/auth/reset-password/' . $this->token . '?email=' . $notifiable->getEmailForPasswordReset(), true);
+        $url = config('discreteapibase.frontend_url')
+                . '/auth/reset-password/'
+                . $this->token
+                . '?email='
+                . $notifiable->getEmailForPasswordReset();
 
         return $this->buildMailMessage($url);
     }

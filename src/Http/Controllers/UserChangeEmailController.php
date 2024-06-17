@@ -8,8 +8,8 @@ use IOF\DiscreteApi\Base\Contracts\UserChangeEmailContract;
 
 class UserChangeEmailController extends DiscreteApiController
 {
-    public function __invoke(Request $request, string $email): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
-        return app(UserChangeEmailContract::class)->do($request->user(), $email);
+        return app(UserChangeEmailContract::class)->do($request->user());
     }
 }

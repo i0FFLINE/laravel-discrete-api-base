@@ -11,7 +11,7 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::create('user_email_changes', function (Blueprint $table) {
-            $table->uuid()->primary();
+            $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->index()->references('id')->on('users')->cascadeOnDelete();
             $table->string('old_email')->index();
             $table->string('new_email')->index();

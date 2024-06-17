@@ -26,7 +26,7 @@ class UserObserver
             $model->assignRole(config('discreteapibase.roles.default_role'));
         }
         // PROFILE (IF ENABLED)
-        if (config('discreteapibase.features.profile') === true) {
+        if (config('discreteapibase.account.features.profile') === true) {
             $model->profile()->create([]);
         }
         // ORGANIZATION (IF ENABLED)

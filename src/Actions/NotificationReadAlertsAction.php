@@ -18,11 +18,13 @@ class NotificationReadAlertsAction extends NotificationReadAlertsContract
     {
         if (! app()->runningInConsole()) {
             if (is_null($Notification)) {
-                return response()->json(null, 404);
-            }
-            Gate::forUser($User)->authorize('update', $Notification);
-            if ($Notification->forceFill(['read_at' => now()])->save()) {
+                $User->notification_alerts()->update(['read_at' => now()]);
                 return response()->json(null, 204);
+            } else {
+                Gate::forUser($User)->authorize('update', $Notification);
+                if ($Notification->forceFill(['read_at' => now()])->save()) {
+                    return response()->json(null, 204);
+                }
             }
 
             return response()->json(null, 406);

@@ -59,6 +59,9 @@ Route::middleware(['auth:sanctum'])->prefix('auth')->group(function () {
             });
         }
 
+        // change email sequence
+        Route::middleware(['throttle:6,1', 'signed'])->get('/confirm-change-email', 'UserChangeEmailController')->name('user.change.email');
+
         // profile
         Route::prefix('/profile')->group(function () {
 
@@ -81,7 +84,11 @@ Route::middleware(['auth:sanctum'])->prefix('auth')->group(function () {
 
         // notifications
         Route::prefix('notifications')->group(function () {
+
+            // get notifications
             Route::get('/', 'NotificationAlertsController');
+
+            // make notification read
             Route::put('/{notification?}', 'NotificationReadAlertsController');
         });
     });

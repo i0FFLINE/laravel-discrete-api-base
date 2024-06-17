@@ -64,10 +64,11 @@ return [
      */
     'observersToRegister' => [
         // base
-        \App\Models\User::class                             => \IOF\DiscreteApi\Base\Observers\UserObserver::class,
-        \IOF\DiscreteApi\Base\Models\Role::class            => \IOF\DiscreteApi\Base\Observers\RoleObserver::class,
-        \IOF\DiscreteApi\Base\Models\Profile::class         => \IOF\DiscreteApi\Base\Observers\ProfileObserver::class,
-        \IOF\DiscreteApi\Base\Models\UserEmailChange::class => \IOF\DiscreteApi\Base\Observers\UserEmailChangeObserver::class,
+        \App\Models\User::class                                 => \IOF\DiscreteApi\Base\Observers\UserObserver::class,
+        \IOF\DiscreteApi\Base\Models\Role::class                => \IOF\DiscreteApi\Base\Observers\RoleObserver::class,
+        \IOF\DiscreteApi\Base\Models\Profile::class             => \IOF\DiscreteApi\Base\Observers\ProfileObserver::class,
+        \IOF\DiscreteApi\Base\Models\UserEmailChange::class     => \IOF\DiscreteApi\Base\Observers\UserEmailChangeObserver::class,
+        \IOF\DiscreteApi\Base\Models\NotificationAlerts::class  => \IOF\DiscreteApi\Base\Observers\NotificationAlertsObserver::class,
     ],
 
 ];

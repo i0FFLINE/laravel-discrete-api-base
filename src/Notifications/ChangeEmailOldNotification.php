@@ -2,10 +2,12 @@
 
 namespace IOF\DiscreteApi\Base\Notifications;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
+use URL;
 
 class ChangeEmailOldNotification extends Notification
 {
@@ -34,8 +36,12 @@ class ChangeEmailOldNotification extends Notification
     {
         $change = $this->User->emailChanges()->latest()->first();
         if (! is_null($change)) {
-            $url = url(config('discreteapibase.frontend_url').'/auth/change-email/'.$change->new_email, [], true);
-
+            //            $url = url(config('discreteapibase.frontend_url').'/auth/change-email/'.$change->new_email, [], true);
+            $url = URL::temporarySignedRoute('user.change.email', Carbon::now()->addMinutes(60), [
+                'id' => $change->getKey(),
+                'hash' => sha1($change->new_email),
+                'email' => $change->new_email
+            ]);
             return $this->buildMailMessage($url);
         }
 

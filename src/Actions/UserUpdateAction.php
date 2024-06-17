@@ -4,6 +4,7 @@ namespace IOF\DiscreteApi\Base\Actions;
 
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use IOF\DiscreteApi\Base\Notifications\ChangeEmailOldNotification;
@@ -17,7 +18,9 @@ class UserUpdateAction extends UserUpdateContract
         if (! app()->runningInConsole()) {
             $Validator = Validator::make($input, [
                 'current_password' => ['required', 'string', new MatchCurrentPasswordRule()],
-                'email' => ['email', 'string', 'max:255', 'unique:users,email'],
+                'email' => ['email', 'string', 'max:255'],
+                'name' => ['required', 'string', 'max:255'],
+                'public_name' => ['required', 'string', 'max:12'],
                 'password' => [
                     'string',
                     'confirmed',
@@ -35,7 +38,6 @@ class UserUpdateAction extends UserUpdateContract
                 ], 404);
             }
             //
-            $saveFlag = false;
             if (strlen($input['email'])) {
                 if ($input['email'] != $User->email) {
                     $User->emailChanges()
@@ -48,12 +50,20 @@ class UserUpdateAction extends UserUpdateContract
                     $User->notify(new ChangeEmailOldNotification($User));
                 }
             }
+            //
+            $saveFlag = false;
+            if (! empty($input['name']) && $input['name'] != $User->name) {
+                $User->name = $input['name'];
+                $saveFlag = true;
+                ;
+            }
             if (! empty($input['password']) && $input['current_password'] != $input['password']) {
                 // save new passord immediatelly
-                $User->forceFill(['password' => Hash::make($input['password'])])
-                    ->save();
-                $User->tokens()
-                    ->delete();
+                $User->forceFill(['password' => Hash::make($input['password'])]);
+                $User->tokens()->delete();
+            }
+            if ($saveFlag == true) {
+                $User->save();
             }
 
             return response()->json(null, 204);

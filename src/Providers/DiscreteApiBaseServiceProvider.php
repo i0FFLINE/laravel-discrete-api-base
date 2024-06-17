@@ -17,8 +17,10 @@ use IOF\DiscreteApi\Base\Contracts\NotificationReadAlertsContract;
 use IOF\DiscreteApi\Base\Contracts\PasswordForgotContract;
 use IOF\DiscreteApi\Base\Contracts\PasswordResetContract;
 use IOF\DiscreteApi\Base\Contracts\LogoutContract;
+use IOF\DiscreteApi\Base\Contracts\UserChangeEmailContract;
 use IOF\DiscreteApi\Base\Contracts\UserDeleteContract;
 use IOF\DiscreteApi\Base\Helpers\DiscreteApiHelper;
+use IOF\DiscreteApi\Base\Http\Middleware\PreloadUserProfileData;
 use IOF\DiscreteApi\Base\Models\Role;
 use IOF\DiscreteApi\Base\Models\PersonalAccessToken;
 use Laravel\Sanctum\Sanctum;
@@ -110,7 +112,7 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
     {
         $parsed = parse_url(config('app.url', 'http://localhost'));
         Route::domain($parsed['host'])
-             ->middleware('api')
+             ->middleware(['api', PreloadUserProfileData::class])
              ->namespace(config('discreteapibase.route_namespace'))
              ->prefix('api')
              ->group(function () {
@@ -153,6 +155,7 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         $this->app->singleton(LogoutContract::class, $actions_namespace.'LogoutAction');
         $this->app->singleton(UserDeleteContract::class, $actions_namespace.'UserDeleteAction');
         $this->app->singleton(UserUpdateContract::class, $actions_namespace.'UserUpdateAction');
+        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace.'UserChangeEmailAction');
         $this->app->singleton(NotificationAlertsContract::class, $actions_namespace.'NotificationAlertsAction');
         $this->app->singleton(NotificationReadAlertsContract::class, $actions_namespace.'NotificationReadAlertsAction');
         $this->app->singleton(ProfileUpdateContract::class, $actions_namespace.'ProfileUpdateAction');

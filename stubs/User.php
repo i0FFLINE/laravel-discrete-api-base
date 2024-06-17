@@ -6,11 +6,15 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use IOF\DiscreteApi\Base\Traits\HasNotificationAlerts;
 use IOF\DiscreteApi\Base\Traits\HasRoles;
+use IOF\DiscreteApi\Base\Traits\HasProfile;
+use IOF\DiscreteApi\Base\Models\UserEmailChange;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\NewAccessToken;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -19,9 +23,11 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory;
     use Notifiable;
-    use HasRoles;
     use HasApiTokens;
     use SoftDeletes;
+    use HasRoles;
+    use HasProfile;
+    use HasNotificationAlerts;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -106,6 +112,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
         /** @var PersonalAccessToken $token */
         return new NewAccessToken($token, $token->getKey().'|'.$plainTextToken);
+    }
+
+    public function emailChanges(): HasMany
+    {
+        return $this->hasMany(UserEmailChange::class, 'user_id');
     }
 
 }
