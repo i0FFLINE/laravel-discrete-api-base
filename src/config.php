@@ -71,4 +71,7 @@ return [
         \IOF\DiscreteApi\Base\Models\NotificationAlerts::class  => \IOF\DiscreteApi\Base\Observers\NotificationAlertsObserver::class,
     ],
 
+    'filesystem' => [
+        'max_upload_size' => 8, // in MEGABYTES !
+    ],
 ];

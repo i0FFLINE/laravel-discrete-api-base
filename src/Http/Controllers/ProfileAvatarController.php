@@ -2,18 +2,19 @@
 
 namespace IOF\DiscreteApi\Base\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use IOF\DiscreteApi\Base\Helpers\DiscreteApiFilesystem;
 
 class ProfileAvatarController extends DiscreteApiController
 {
-    public function __invoke(Request $request): Response|BinaryFileResponse
+    public function __invoke(Request $request): RedirectResponse|Response
     {
         if (is_null($request->user()->profile->avatar_path)) {
-            return response()->noContent(204);
+            return response()->noContent();
         }
 
-        return response()->file(($request->user()->profile->avatarDisk() == 'public' ? 'storage/' : null).$request->user()->profile->avatar_path);
+        return response()->redirectTo(DiscreteApiFilesystem::get_file($request->user()->profile, 'avatar_path'));
     }
 }

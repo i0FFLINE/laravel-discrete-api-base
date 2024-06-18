@@ -3,33 +3,35 @@
 namespace IOF\DiscreteApi\Base\Providers;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
 use IOF\DiscreteApi\Base\Console\Commands\AssignUserRoleCommand;
-use IOF\DiscreteApi\Base\Contracts\UserUpdateContract;
-use IOF\DiscreteApi\Base\Contracts\RegisterContract;
 use IOF\DiscreteApi\Base\Contracts\AuthenticateContract;
+use IOF\DiscreteApi\Base\Contracts\LogoutContract;
 use IOF\DiscreteApi\Base\Contracts\NotificationAlertsContract;
 use IOF\DiscreteApi\Base\Contracts\NotificationReadAlertsContract;
 use IOF\DiscreteApi\Base\Contracts\PasswordForgotContract;
 use IOF\DiscreteApi\Base\Contracts\PasswordResetContract;
-use IOF\DiscreteApi\Base\Contracts\LogoutContract;
+use IOF\DiscreteApi\Base\Contracts\ProfileAvatarUpdateContract;
+use IOF\DiscreteApi\Base\Contracts\ProfileUpdateContract;
+use IOF\DiscreteApi\Base\Contracts\RegisterContract;
 use IOF\DiscreteApi\Base\Contracts\UserChangeEmailContract;
 use IOF\DiscreteApi\Base\Contracts\UserDeleteContract;
+use IOF\DiscreteApi\Base\Contracts\UserUpdateContract;
 use IOF\DiscreteApi\Base\Helpers\DiscreteApiHelper;
 use IOF\DiscreteApi\Base\Http\Middleware\PreloadUserProfileData;
-use IOF\DiscreteApi\Base\Models\Role;
 use IOF\DiscreteApi\Base\Models\PersonalAccessToken;
+use IOF\DiscreteApi\Base\Models\Role;
 use Laravel\Sanctum\Sanctum;
 
 class DiscreteApiBaseServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config.php', 'discreteapibase');
+        $this->mergeConfigFrom(__DIR__ . '/../config.php', 'discreteapibase');
         $this->app->bind('role', function () {
             return new Role();
         });
@@ -37,9 +39,9 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadTranslationsFrom(__DIR__.'/../../lang', 'discreteapibase');
-        $this->loadJsonTranslationsFrom(__DIR__.'/../../lang');
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+        $this->loadTranslationsFrom(__DIR__ . '/../../lang', 'discreteapibase');
+        $this->loadJsonTranslationsFrom(__DIR__ . '/../../lang');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
         $this->modifyVerificationEmailNotification();
         //
@@ -71,25 +73,23 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
     protected function configurePublishing(): void
     {
         if ($this->app->runningInConsole()) {
-
             $this->publishes([
-                realpath(__DIR__.'/../../database/migrations') => base_path('database/migrations'),
-                realpath(__DIR__.'/../../lang') => lang_path('vendor/discreteapibase'),
-                realpath(__DIR__.'/../../stubs/User.php') => app_path('/Models/User.php')
+                realpath(__DIR__ . '/../../database/migrations') => base_path('database/migrations'),
+                realpath(__DIR__ . '/../../lang') => lang_path('vendor/discreteapibase'),
+                realpath(__DIR__ . '/../../stubs/User.php') => app_path('/Models/User.php')
             ], 'discreteapibase-install');
 
             $this->publishes([
-                realpath(__DIR__.'/../../database/migrations') => base_path('database/migrations'),
+                realpath(__DIR__ . '/../../database/migrations') => base_path('database/migrations'),
             ], 'discreteapibase-migrations');
 
             $this->publishes([
-                realpath(__DIR__.'/../../lang') => lang_path('vendor/discreteapibase'),
+                realpath(__DIR__ . '/../../lang') => lang_path('vendor/discreteapibase'),
             ], 'discreteapibase-lang');
 
             $this->publishes([
-                realpath(__DIR__.'/../../stubs/User.php') => app_path('/Models/User.php')
+                realpath(__DIR__ . '/../../stubs/User.php') => app_path('/Models/User.php')
             ], 'discreteapibase-models');
-
         }
     }
 
@@ -110,14 +110,15 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
      */
     protected function configureRoutes(): void
     {
-        $parsed = parse_url(config('app.url', 'http://localhost'));
+        $parsed = DiscreteApiHelper::detail_url(config('app.url', 'http://localhost'));
         Route::domain($parsed['host'])
-             ->middleware(['api', PreloadUserProfileData::class])
-             ->namespace(config('discreteapibase.route_namespace'))
-             ->prefix('api')
-             ->group(function () {
-                 $this->loadRoutesFrom(__DIR__.'/../routes.php');
-             });
+            ->middleware([
+                'api',
+                PreloadUserProfileData::class
+            ])
+            ->namespace(config('discreteapibase.route_namespace'))->prefix('api')->group(function () {
+                $this->loadRoutesFrom(__DIR__ . '/../routes.php');
+            });
     }
 
     /**
@@ -145,21 +146,21 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         }
     }
 
-    protected function configureActions()
+    protected function configureActions(): void
     {
         $actions_namespace = config('discreteapibase.actions_namespace') . '\\';
-        $this->app->singleton(RegisterContract::class, $actions_namespace.'RegisterAction');
-        $this->app->singleton(AuthenticateContract::class, $actions_namespace.'AuthenticateAction');
-        $this->app->singleton(PasswordForgotContract::class, $actions_namespace.'PasswordForgotAction');
-        $this->app->singleton(PasswordResetContract::class, $actions_namespace.'PasswordResetAction');
-        $this->app->singleton(LogoutContract::class, $actions_namespace.'LogoutAction');
-        $this->app->singleton(UserDeleteContract::class, $actions_namespace.'UserDeleteAction');
-        $this->app->singleton(UserUpdateContract::class, $actions_namespace.'UserUpdateAction');
-        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace.'UserChangeEmailAction');
-        $this->app->singleton(NotificationAlertsContract::class, $actions_namespace.'NotificationAlertsAction');
-        $this->app->singleton(NotificationReadAlertsContract::class, $actions_namespace.'NotificationReadAlertsAction');
-        $this->app->singleton(ProfileUpdateContract::class, $actions_namespace.'ProfileUpdateAction');
-        $this->app->singleton(ProfileAvatarUpdateContract::class, $actions_namespace.'ProfileAvatarUpdateAction');
-        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace.'UserChangeEmailAction');
+        $this->app->singleton(RegisterContract::class, $actions_namespace . 'RegisterAction');
+        $this->app->singleton(AuthenticateContract::class, $actions_namespace . 'AuthenticateAction');
+        $this->app->singleton(PasswordForgotContract::class, $actions_namespace . 'PasswordForgotAction');
+        $this->app->singleton(PasswordResetContract::class, $actions_namespace . 'PasswordResetAction');
+        $this->app->singleton(LogoutContract::class, $actions_namespace . 'LogoutAction');
+        $this->app->singleton(UserDeleteContract::class, $actions_namespace . 'UserDeleteAction');
+        $this->app->singleton(UserUpdateContract::class, $actions_namespace . 'UserUpdateAction');
+        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace . 'UserChangeEmailAction');
+        $this->app->singleton(NotificationAlertsContract::class, $actions_namespace . 'NotificationAlertsAction');
+        $this->app->singleton(NotificationReadAlertsContract::class, $actions_namespace . 'NotificationReadAlertsAction');
+        $this->app->singleton(ProfileUpdateContract::class, $actions_namespace . 'ProfileUpdateAction');
+        $this->app->singleton(ProfileAvatarUpdateContract::class, $actions_namespace . 'ProfileAvatarUpdateAction');
+        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace . 'UserChangeEmailAction');
     }
 }

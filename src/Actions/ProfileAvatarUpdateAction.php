@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use IOF\DiscreteApi\Base\Contracts\ProfileAvatarUpdateContract;
+use IOF\DiscreteApi\Base\Helpers\DiscreteApiFilesystem;
 
 class ProfileAvatarUpdateAction extends ProfileAvatarUpdateContract
 {
@@ -15,13 +16,11 @@ class ProfileAvatarUpdateAction extends ProfileAvatarUpdateContract
             $Validator = Validator::make($input, [
                 'avatar' => ['required', 'image', 'nullable', 'mimes:jpg,jpeg,png,gif', 'max:1024'],
             ]);
-            //
             if ($Validator->fails()) {
                 return response()->json(['errors' => $Validator->errors()->toArray()], 404);
             } else {
-                $Profile = $User->profile;
-                if (! is_null($Profile)) {
-                    $Profile->updateProfileAvatar(request()->file('avatar'));
+                if (! is_null($User->profile)) {
+                    DiscreteApiFilesystem::put_file(request()->file('avatar'), 'profile_avatars/' . $User->id, $User->profile, 'avatar_path');
                 }
                 $User->load(['profile']);
                 return response()->json($User->toArray());

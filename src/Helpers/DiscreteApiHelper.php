@@ -11,7 +11,7 @@ class DiscreteApiHelper
     {
         $last = last(explode("-", Str::uuid()));
         $Validator = Validator::make(['last' => $last], [
-            'last' => ['required', 'string','max:12', 'min:12', 'unique:users,public_name'],
+            'last' => ['required', 'string', 'max:12', 'min:12', 'unique:users,public_name'],
         ]);
         if ($Validator->fails()) {
             return static::generate_unique_public_user_name();
@@ -41,38 +41,31 @@ class DiscreteApiHelper
         if (empty($p['scheme']) || empty($p['host']) || empty($p['path']) || empty($p['query'])) {
             return null;
         }
-        $return = "";
-        $return .= $p['scheme'].'://';
-        if(!empty($p['user'])) {
+        $return = $p['scheme'] . '://';
+        if (!empty($p['user'])) {
             $return .= $p['user'];
-            if(!empty($p['pass'])) {
-                $return .= ':'.$p[''].'@';
+            if (!empty($p['pass'])) {
+                $return .= ':' . $p[''] . '@';
             } else {
                 $return .= '@';
             }
         }
-        if(!empty($p['host'])) {
-            $return .= $p['host'];
+        $return .= $p['host'];
+        if (!empty($p['port'])) {
+            $return .= ':' . $p['port'];
         }
-        if(!empty($p['port'])) {
-            $return .= ':'.$p['port'];
-        }
-        if(!empty($p['path'])) {
-            $return .= $p['path'];
-        }
-        if(!empty($p['query'])) {
-            $x = false;
-            $return .= '?';
-            foreach($p['query'] as $_q => $_v) {
-                if ($x == true) {
-                    $return .= "&";
-                }
-                $return .= $_q.'='.$_v;
-                $x = true;
+        $return .= $p['path'];
+        $x = false;
+        $return .= '?';
+        foreach ($p['query'] as $_q => $_v) {
+            if ($x) {
+                $return .= "&";
             }
+            $return .= $_q . '=' . $_v;
+            $x = true;
         }
-        if(!empty($p['fragment'])) {
-            $return .= '#'.$p['fragment'];
+        if (!empty($p['fragment'])) {
+            $return .= '#' . $p['fragment'];
         }
         return $return;
     }
