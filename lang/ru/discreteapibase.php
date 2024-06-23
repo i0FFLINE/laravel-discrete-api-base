@@ -18,4 +18,8 @@ return [
     'If you have not requested a change to your account email address, no further action is required.' => 'Если вы не запрашивали изменения адреса электронной почты вашей учётной записи, дальнейшие действия не требуются.',
     'The OLD Email is:' => 'СТАРЫЙ адрес электронной почты: :email',
     'The NEW Email is:' => 'НОВЫЙ адрес электронной почты: :email',
+    'Personal organization' => 'Личная организация',
+    'Your personal organization, but you can invite new members into the organization to share content.' => 'Ваша частная организация, но вы можете приглашать новых членов в организацию, чтобы делиться содержимым.',
+    'Personal workspace' => 'Личное рабочее пространство',
+    'Your personal workspace. You will share content if organization has invited members' => 'ше личное рабочее пространство. Вы будете делиться содержимым, если организация пригласила участников.',
 ];

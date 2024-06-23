@@ -23,15 +23,13 @@
     "php": "^8.2|^8.3",
     "laravel/framework": "^10.0|^11.0",
     "laravel/sanctum": "^3.0|^4.0",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ioffline/utils": "0.1.0"
   },
   "require-dev": {
     "laravel/pint": "^1.0"
   },
   "extra": {
-    "branch-alias": {
-      "dev-master": "0.x-dev"
-    },
     "laravel": {
       "providers": [
         "IOF\\DiscreteApi\\Base\\Providers\\DiscreteApiBaseServiceProvider"
@@ -44,5 +42,12 @@
     "optimize-autoloader": true
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "repositories": {
+    "utils": {
+      "type": "path",
+      "symlink": true,
+      "url": "../utils/"
+    }
+  }
 }

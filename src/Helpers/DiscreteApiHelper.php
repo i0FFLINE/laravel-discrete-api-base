@@ -2,8 +2,11 @@
 
 namespace IOF\DiscreteApi\Base\Helpers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use IOF\DiscreteApi\Base\Models\Organization;
+use IOF\Utils\Sorter;
 
 class DiscreteApiHelper
 {
@@ -68,5 +71,53 @@ class DiscreteApiHelper
             $return .= '#' . $p['fragment'];
         }
         return $return;
+    }
+
+    public static function new_organization(User $User, array $o = [], array $w = []): ?Organization
+    {
+        if (config('discreteapibase.features.organizations') === true) {
+            $Organization = Organization::create([
+                Sorter::FIELD => $User->organizations()->count() + 1,
+                'title' => empty($o['title']) ? trans('Personal organization') : $o['title'],
+                'description' => empty($o['description']) ? trans('Your personal organization, but you can invite new members into the organization to share content.') : $o['description'],
+                'owner_id' => $User->id,
+            ]);
+            if (!is_null($Organization)) {
+                $Organization->membership()->create([
+                    'user_id' => $User->id,
+                    'role' => 10,
+                    'updated_by' => $User->id,
+                ]);
+                $Organization->workspaces()->create([
+                    Sorter::FIELD => 1,
+                    'title' => empty($w['title']) ? trans('Personal workspace') : $w['title'],
+                    'description' => empty($w['description']) ? trans('Your personal organization, but you can invite new members into the organization to share content.') : $w['description'],
+                ]);
+            }
+            return $Organization;
+        }
+        return null;
+    }
+
+    public static function in_organization(User $User, Organization $Organization): bool
+    {
+        if ($Organization->owner_id == $User->id) {
+            return true;
+        }
+        if ($Organization->members()->where('user_id', $User->id)->where('role', '>=', 0)->count()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function organization_member_role(User $User, Organization $Organization): ?int
+    {
+        if ($Organization->owner_id == $User->id) {
+            return 10;
+        }
+        if ($Membership = $Organization->members()->where('user_id', $User->id)->first()) {
+            return $Membership->role;
+        }
+        return null;
     }
 }

@@ -3,17 +3,24 @@
 namespace IOF\DiscreteApi\Base\Models;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @method static where(string $string, mixed $role)
+ * @property integer $id
+ * @property string $name
+ * @property string $label
+ * @property string $comment
+ * @property boolean $is_protected
+ * @property DateTimeInterface $created_at
+ * @property DateTimeInterface $updated_at
+ * @property DateTimeInterface $deleted_at
+ * @method static where(string $key, mixed $val)
  */
 class Role extends Model
 {
-    use HasFactory;
     use SoftDeletes;
 
     /**
@@ -61,5 +68,4 @@ class Role extends Model
     {
         return $this->belongsToMany(User::class);
     }
-
 }

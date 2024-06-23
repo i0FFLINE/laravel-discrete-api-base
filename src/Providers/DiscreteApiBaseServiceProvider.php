@@ -8,23 +8,31 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use IOF\DiscreteApi\Base\Console\Commands\AssignUserRoleCommand;
-use IOF\DiscreteApi\Base\Contracts\AuthenticateContract;
-use IOF\DiscreteApi\Base\Contracts\LogoutContract;
-use IOF\DiscreteApi\Base\Contracts\NotificationAlertsContract;
-use IOF\DiscreteApi\Base\Contracts\NotificationReadAlertsContract;
-use IOF\DiscreteApi\Base\Contracts\PasswordForgotContract;
-use IOF\DiscreteApi\Base\Contracts\PasswordResetContract;
-use IOF\DiscreteApi\Base\Contracts\ProfileAvatarUpdateContract;
-use IOF\DiscreteApi\Base\Contracts\ProfileUpdateContract;
-use IOF\DiscreteApi\Base\Contracts\RegisterContract;
-use IOF\DiscreteApi\Base\Contracts\UserChangeEmailContract;
-use IOF\DiscreteApi\Base\Contracts\UserDeleteContract;
-use IOF\DiscreteApi\Base\Contracts\UserUpdateContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\NotificationAlerts\NotificationAlertsContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\NotificationAlerts\NotificationReadAlertsContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\Organizations\OrganizationCreateContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\Organizations\OrganizationsContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\Organizations\OrganizationUpdateContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\Profile\ProfileAvatarUpdateContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\Profile\ProfileUpdateContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\User\LogoutContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\User\UserChangeEmailContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\User\UserDeleteContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\User\UserUpdateContract;
+use IOF\DiscreteApi\Base\Contracts\Guest\AuthenticateContract;
+use IOF\DiscreteApi\Base\Contracts\Guest\PasswordForgotContract;
+use IOF\DiscreteApi\Base\Contracts\Guest\PasswordResetContract;
+use IOF\DiscreteApi\Base\Contracts\Guest\RegisterContract;
 use IOF\DiscreteApi\Base\Helpers\DiscreteApiHelper;
-use IOF\DiscreteApi\Base\Http\Middleware\PreloadUserProfileData;
+use IOF\DiscreteApi\Base\Http\Middleware\PreloadUserData;
+use IOF\DiscreteApi\Base\Http\Middleware\SetLocale;
+use IOF\DiscreteApi\Base\Models\NotificationAlerts;
+use IOF\DiscreteApi\Base\Models\Organization;
 use IOF\DiscreteApi\Base\Models\PersonalAccessToken;
 use IOF\DiscreteApi\Base\Models\Role;
+use IOF\DiscreteApi\Base\Models\Workspace;
 use Laravel\Sanctum\Sanctum;
 
 class DiscreteApiBaseServiceProvider extends ServiceProvider
@@ -111,14 +119,13 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
     protected function configureRoutes(): void
     {
         $parsed = DiscreteApiHelper::detail_url(config('app.url', 'http://localhost'));
-        Route::domain($parsed['host'])
-            ->middleware([
-                'api',
-                PreloadUserProfileData::class
-            ])
-            ->namespace(config('discreteapibase.route_namespace'))->prefix('api')->group(function () {
-                $this->loadRoutesFrom(__DIR__ . '/../routes.php');
-            });
+        Route::domain($parsed['host'])->middleware([
+            'api',
+            SetLocale::class,
+            PreloadUserData::class
+        ])->namespace(config('discreteapibase.route_namespace'))->prefix('api')->group(function () {
+            $this->loadRoutesFrom(__DIR__ . '/../routes.php');
+        });
     }
 
     /**
@@ -149,18 +156,26 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
     protected function configureActions(): void
     {
         $actions_namespace = config('discreteapibase.actions_namespace') . '\\';
-        $this->app->singleton(RegisterContract::class, $actions_namespace . 'RegisterAction');
-        $this->app->singleton(AuthenticateContract::class, $actions_namespace . 'AuthenticateAction');
-        $this->app->singleton(PasswordForgotContract::class, $actions_namespace . 'PasswordForgotAction');
-        $this->app->singleton(PasswordResetContract::class, $actions_namespace . 'PasswordResetAction');
-        $this->app->singleton(LogoutContract::class, $actions_namespace . 'LogoutAction');
-        $this->app->singleton(UserDeleteContract::class, $actions_namespace . 'UserDeleteAction');
-        $this->app->singleton(UserUpdateContract::class, $actions_namespace . 'UserUpdateAction');
-        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace . 'UserChangeEmailAction');
-        $this->app->singleton(NotificationAlertsContract::class, $actions_namespace . 'NotificationAlertsAction');
-        $this->app->singleton(NotificationReadAlertsContract::class, $actions_namespace . 'NotificationReadAlertsAction');
-        $this->app->singleton(ProfileUpdateContract::class, $actions_namespace . 'ProfileUpdateAction');
-        $this->app->singleton(ProfileAvatarUpdateContract::class, $actions_namespace . 'ProfileAvatarUpdateAction');
-        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace . 'UserChangeEmailAction');
+        // Guest Actions
+        $this->app->singleton(RegisterContract::class, $actions_namespace . 'Guest\\RegisterAction');
+        $this->app->singleton(AuthenticateContract::class, $actions_namespace . 'Guest\\AuthenticateAction');
+        $this->app->singleton(PasswordForgotContract::class, $actions_namespace . 'Guest\\PasswordForgotAction');
+        $this->app->singleton(PasswordResetContract::class, $actions_namespace . 'Guest\\PasswordResetAction');
+        // Auth Actions
+        $this->app->singleton(LogoutContract::class, $actions_namespace . 'Auth\\LogoutAction');
+        // Auth\User Actions
+        $this->app->singleton(UserDeleteContract::class, $actions_namespace . 'Auth\\User\\UserDeleteAction');
+        $this->app->singleton(UserUpdateContract::class, $actions_namespace . 'Auth\\User\\UserUpdateAction');
+        $this->app->singleton(UserChangeEmailContract::class, $actions_namespace . 'Auth\\User\\UserChangeEmailAction');
+        // Auth\NotificationAlerts Actions
+        $this->app->singleton(NotificationAlertsContract::class, $actions_namespace . 'Auth\\NotificationAlerts\\NotificationAlertsAction');
+        $this->app->singleton(NotificationReadAlertsContract::class, $actions_namespace . 'Auth\\NotificationAlerts\\NotificationReadAlertsAction');
+        // Auth\Profile Actions
+        $this->app->singleton(ProfileUpdateContract::class, $actions_namespace . 'Auth\\Profile\\ProfileUpdateAction');
+        $this->app->singleton(ProfileAvatarUpdateContract::class, $actions_namespace . 'Auth\\Profile\\ProfileAvatarUpdateAction');
+        // Auth\Organization Actions
+        $this->app->singleton(OrganizationsContract::class, $actions_namespace . 'Auth\\Organizations\\OrganizationsAction');
+        $this->app->singleton(OrganizationCreateContract::class, $actions_namespace . 'Auth\\Organizations\\OrganizationCreateAction');
+        $this->app->singleton(OrganizationUpdateContract::class, $actions_namespace . 'Auth\\Organizations\\OrganizationUpdateAction');
     }
 }

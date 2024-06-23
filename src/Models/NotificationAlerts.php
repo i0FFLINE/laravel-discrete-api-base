@@ -2,10 +2,26 @@
 
 namespace IOF\DiscreteApi\Base\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use IOF\DiscreteApi\Base\Traits\BelongsToUser;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $type
+ * @property boolean $dismissable
+ * @property integer $auto_dismiss
+ * @property string $message
+ * @property DateTimeInterface $read_at
+ * @property DateTimeInterface $created_at
+ * @property DateTimeInterface $updated_at
+ * @property DateTimeInterface $deleted_at
+ * @method static where(string $key, mixed $val)
+ * @method static findOrFail(string $value)
+ * @method static find($value)
+ */
 class NotificationAlerts extends Model
 {
     use BelongsToUser;
@@ -77,7 +93,7 @@ class NotificationAlerts extends Model
         );
     }
 
-    public function notificationCreated(): Attribute
+    public function notificationCreated(): Attributew
     {
         return new Attribute(
             get: fn (): ?string => $this->created_at

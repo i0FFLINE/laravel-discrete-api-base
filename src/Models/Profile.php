@@ -6,14 +6,26 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use IOF\DiscreteApi\Base\Helpers\DiscreteApiFilesystem;
+use IOF\DiscreteApi\Base\Traits\BelongsToOrganization;
 use IOF\DiscreteApi\Base\Traits\BelongsToUser;
+use IOF\DiscreteApi\Base\Traits\BelongsToWorkspace;
 
 /**
+ * @property string $id
  * @property string $user_id
+ * @property string $locale
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $avatar_path
+ * @property string $organization_id
+ * @property string $workspace_id
+ * @method static where(string $key, mixed $val)
  */
 class Profile extends Model
 {
     use BelongsToUser;
+    use BelongsToOrganization;
+    use BelongsToWorkspace;
 
     public $timestamps = false;
     /**
@@ -39,7 +51,15 @@ class Profile extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id', 'locale', 'firstname', 'lastname', 'avatar_path'];
+    protected $fillable = [
+        'user_id',
+        'locale',
+        'firstname',
+        'lastname',
+        'avatar_path',
+        'organization_id',
+        'workspace_id',
+    ];
     /**
      * The attributes that should be hidden for serialization.
      *

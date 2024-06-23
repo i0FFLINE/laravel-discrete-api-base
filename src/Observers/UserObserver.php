@@ -2,8 +2,9 @@
 
 namespace IOF\DiscreteApi\Base\Observers;
 
-use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Str;
+use IOF\DiscreteApi\Base\Helpers\DiscreteApiHelper;
 
 class UserObserver
 {
@@ -16,6 +17,8 @@ class UserObserver
 
     public function created(User $model): void
     {
+        // INIT
+        $profile = [];
         // ROLE
         if (User::all()->count() == 1) {
             $model->assignRole(config('discreteapibase.roles.super_role'));
@@ -25,10 +28,20 @@ class UserObserver
         } else {
             $model->assignRole(config('discreteapibase.roles.default_role'));
         }
-        // PROFILE (IF ENABLED)
-        if (config('discreteapibase.account.features.profile') === true) {
-            $model->profile()->create([]);
-        }
         // ORGANIZATION (IF ENABLED)
+        $Organization = DiscreteApiHelper::new_organization($model);
+        if (!is_null($Organization)) {
+            $profile['organization_id'] = $Organization->id;
+            $profile['workspace_id'] = $Organization->workspaces()->first()->id;
+        }
+        // FIRST-TIME LOCALE
+        $headers_locale = request()->headers->get('Accept-Language', 'en');
+        if (!is_null($headers_locale) && in_array($headers_locale, array_keys(config('discreteapibase.locales')))) {
+            $profile['locale'] = $headers_locale;
+        }
+        // PROFILE (IF ENABLED)
+        if (config('discreteapibase.features.profile') === true) {
+            $model->profile()->create($profile);
+        }
     }
 }

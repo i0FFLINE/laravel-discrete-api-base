@@ -18,4 +18,8 @@ return [
     'If you have not requested a change to your account email address, no further action is required.' => 'If you have not requested a change to your account email address, no further action is required.',
     'The OLD Email is:' => 'The OLD Email is: :email',
     'The NEW Email is:' => 'The NEW Email is: :email',
+    'Personal organization' => 'Personal organization',
+    'Your personal organization, but you can invite new members into the organization to share content.' => 'Your personal organization, but you can invite new members into the organization to share content.',
+    'Personal workspace' => 'Personal workspace',
+    'Your personal workspace. You will share content if organization has invited members' => 'Your personal workspace. You will share content if organization has invited members',
 ];

@@ -2,8 +2,8 @@
 
 namespace IOF\DiscreteApi\Base\Traits;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\User;
 
 trait BelongsToUser
 {

@@ -3,10 +3,24 @@
 namespace IOF\DiscreteApi\Base\Models;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use IOF\DiscreteApi\Base\Traits\BelongsToUser;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $old_email
+ * @property string $new_email
+ * @property DateTimeInterface $old_email_verified_at
+ * @property DateTimeInterface $new_email_verified_at
+ * @property DateTimeInterface $valid_until
+ * @property DateTimeInterface $created_at
+ * @property DateTimeInterface $updated_at
+ * @property DateTimeInterface $deleted_at
+ * @method static where(string $key, mixed $val)
+ */
 class UserEmailChange extends Model
 {
     use BelongsToUser;

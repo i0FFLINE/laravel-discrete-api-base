@@ -3,34 +3,50 @@
 namespace IOF\DiscreteApi\Base\Models;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
+use IOF\DiscreteApi\Base\Traits\HasEmailChanges;
 use IOF\DiscreteApi\Base\Traits\HasNotificationAlerts;
-use IOF\DiscreteApi\Base\Traits\HasRoles;
+use IOF\DiscreteApi\Base\Traits\HasOrganizations;
 use IOF\DiscreteApi\Base\Traits\HasProfile;
+use IOF\DiscreteApi\Base\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
-use Laravel\Sanctum\NewAccessToken;
-use Laravel\Sanctum\PersonalAccessToken;
 
 /**
+ * @property string $id
+ * @property string $name
+ * @property string $email
+ * @property string $public_name
+ * @property string $password
+ * @property boolean $is_banned
+ * @property string $remember_token
+ * @property DateTimeInterface $email_verified_at
+ * @property DateTimeInterface $created_at
+ * @property DateTimeInterface $updated_at
+ * @property DateTimeInterface $deleted_at
+ * @property boolean $is_confirmed
  * @property Profile $profile
- * @property mixed $id
+ * @property Collection $roles
+ * @property Collection $notification_alerts
+ * @property Collection $emailChanges
+ * @property Collection $organizations
+ * @property Collection $membership
+ * @method static where(string $key, mixed $val)
  */
 class BaseUser extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory;
     use Notifiable;
     use HasApiTokens;
     use SoftDeletes;
-    use HasRoles;
     use HasProfile;
+    use HasRoles;
     use HasNotificationAlerts;
+    use HasEmailChanges;
+    use HasOrganizations;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -63,6 +79,7 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $hidden = [
+        'email',
         'password',
         'remember_token',
         'email_verified_at',
@@ -81,15 +98,6 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
         'is_confirmed',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'deleted_at' => 'datetime',
-        ];
-    }
-
     public function getIncrementing(): bool
     {
         return true;
@@ -102,24 +110,15 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
 
     public function isConfirmed(): Attribute
     {
-        return Attribute::get(fn () => (bool) $this->hasVerifiedEmail());
+        return Attribute::get(fn() => (bool)$this->hasVerifiedEmail());
     }
 
-    public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null): NewAccessToken
+    protected function casts(): array
     {
-        $token = $this->tokens()->create([
-            'name' => $name,
-            'token' => hash('sha256', $plainTextToken = Str::random(41)),
-            'abilities' => $abilities,
-        ]);
-
-        /** @var PersonalAccessToken $token */
-        return new NewAccessToken($token, $token->getKey().'|'.$plainTextToken);
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'deleted_at' => 'datetime',
+        ];
     }
-
-    public function emailChanges(): HasMany
-    {
-        return $this->hasMany(UserEmailChange::class, 'user_id');
-    }
-
 }
