@@ -9,33 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 use IOF\DiscreteApi\Base\Traits\BelongsToUser;
 
 /**
- * @property string $id
  * @property string $user_id
- * @property string $old_email
- * @property string $new_email
- * @property DateTimeInterface $old_email_verified_at
- * @property DateTimeInterface $new_email_verified_at
+ * @property string $old_email_verified_at
+ * @property string $new_email_verified_at
  * @property DateTimeInterface $valid_until
- * @property DateTimeInterface $created_at
- * @property DateTimeInterface $updated_at
- * @property DateTimeInterface $deleted_at
- * @method static where(string $key, mixed $val)
  */
 class UserEmailChange extends Model
 {
     use BelongsToUser;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'user_email_changes';
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id',
         'old_email',
@@ -44,35 +27,15 @@ class UserEmailChange extends Model
         'new_email_verified_at',
         'valid_until',
     ];
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'id',
     ];
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'old_email_verified_at' => 'datetime',
         'new_email_verified_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
-    /**
-     * The relationships that should be touched on save.
-     *
-     * @var array
-     */
     protected $touches = ['user'];
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
     protected $appends = [
         'is_old_confirmed',
         'is_new_confirmed',
@@ -91,15 +54,13 @@ class UserEmailChange extends Model
 
     public function isOldConfirmed(): Attribute
     {
-        return Attribute::get(function (): bool {
-            return (bool) $this->old_email_verified_at;
-        });
+        return Attribute::get(fn (): bool => (bool)$this->old_email_verified_at);
     }
 
     public function isNewConfirmed(): Attribute
     {
         return Attribute::get(function (): bool {
-            return (bool) $this->new_email_verified_at;
+            return (bool)$this->new_email_verified_at;
         });
     }
 

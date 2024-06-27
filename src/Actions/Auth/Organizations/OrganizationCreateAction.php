@@ -23,14 +23,10 @@ class OrganizationCreateAction extends OrganizationCreateContract
             if ($Validator->fails()) {
                 return response()->json(['errors' => $Validator->errors()->toArray(),], 404);
             }
-            $Organization = DiscreteApiHelper::new_organization($User, ['title' => $input['o_title'], 'description' => $input['o_description']], ['title' => $input['w_title'], 'description' => $input['w_description']]);
-            $Organization->load([
-                'workspaces',
-                'membership'
-            ]);
+            $Organization = DiscreteApiHelper::new_organization($User, ['title' => $input['o_title'], 'description' => $input['o_description']]);
+            $Organization->load(['membership']);
             $User->profile->forceFill([
                 'organization_id' => $Organization->id,
-                'workspace_id' => $Organization->workspaces->first()->id,
             ])->save();
             return response()->noContent();
         }

@@ -13,18 +13,17 @@ class OrganizationController extends DiscreteApiController
 {
     public function __invoke(Request $request, string $id = null): JsonResponse|Response
     {
-        if (!is_null($id) && !Str::isUuid($id)) {
+        if (is_null($id) || !Str::isUuid($id)) {
             return response()->noContent(404);
         }
-        if (!is_null($id)) {
-            $Oo = Organization::with(['membership.user.profile'])->findOrFail($id);
-            $roles = config('discreteapibase.organization.roles');
-            foreach($Oo->membership as &$membership) {
-                $membership->makeHidden(['organization_id']);
+        $Oo = Organization::with(['membership.user.profile'])->findOrFail($id);
+        $roles = config('discreteapibase.organization.roles');
+        if ($Oo->membership->count()) {
+            $Oo->membership->each(function (&$membership) use ($roles) {
+                $membership->makeHidden([config('discreteapibase.organization.singular_name') . '_id']);
                 $membership->role_title = trans(ucfirst($roles[$membership->role]));
-            }
-            return response()->json($Oo->toArray());
+            });
         }
-        return response()->noContent(404);
+        return response()->json($Oo->toArray());
     }
 }

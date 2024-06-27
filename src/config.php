@@ -1,5 +1,27 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Str;
+use IOF\DiscreteApi\Base\Models\NotificationAlerts;
+use IOF\DiscreteApi\Base\Models\Organization;
+use IOF\DiscreteApi\Base\Models\OrganizationMember;
+use IOF\DiscreteApi\Base\Models\Profile;
+use IOF\DiscreteApi\Base\Models\Role;
+use IOF\DiscreteApi\Base\Models\UserEmailChange;
+use IOF\DiscreteApi\Base\Observers\NotificationAlertsObserver;
+use IOF\DiscreteApi\Base\Observers\OrganizationMemberObserver;
+use IOF\DiscreteApi\Base\Observers\OrganizationObserver;
+use IOF\DiscreteApi\Base\Observers\ProfileObserver;
+use IOF\DiscreteApi\Base\Observers\UserEmailChangeObserver;
+use IOF\DiscreteApi\Base\Observers\UserObserver;
+use IOF\DiscreteApi\Base\Policies\NotificationAlertsPolicy;
+use IOF\DiscreteApi\Base\Policies\OrganizationMemberPolicy;
+use IOF\DiscreteApi\Base\Policies\OrganizationPolicy;
+use IOF\DiscreteApi\Base\Policies\ProfilePolicy;
+use IOF\DiscreteApi\Base\Policies\RolePolicy;
+use IOF\DiscreteApi\Base\Policies\UserEmailChangePolicy;
+use IOF\DiscreteApi\Base\Policies\UserPolicy;
+
 return [
     /**
      * Frontend settings
@@ -21,6 +43,7 @@ return [
         'email_verification' => true,
         'user_delete' => true,
         'organizations' => true,
+        '2fa' => 'email', // email | google | false
     ],
 
     /**
@@ -43,14 +66,13 @@ return [
      */
     'policiesToRegister' => [
         // base
-        \App\Models\User::class => \IOF\DiscreteApi\Base\Policies\UserPolicy::class,
-        \IOF\DiscreteApi\Base\Models\Role::class => \IOF\DiscreteApi\Base\Policies\RolePolicy::class,
-        \IOF\DiscreteApi\Base\Models\Profile::class => \IOF\DiscreteApi\Base\Policies\ProfilePolicy::class,
-        \IOF\DiscreteApi\Base\Models\UserEmailChange::class => \IOF\DiscreteApi\Base\Policies\UserEmailChangePolicy::class,
-        \IOF\DiscreteApi\Base\Models\NotificationAlerts::class => \IOF\DiscreteApi\Base\Policies\NotificationAlertsPolicy::class,
-        \IOF\DiscreteApi\Base\Models\Organization::class => \IOF\DiscreteApi\Base\Policies\OrganizationPolicy::class,
-        \IOF\DiscreteApi\Base\Models\OrganizationMember::class => \IOF\DiscreteApi\Base\Policies\OrganizationMemberPolicy::class,
-        \IOF\DiscreteApi\Base\Models\Workspace::class => \IOF\DiscreteApi\Base\Policies\WorkspacePolicy::class,
+        User::class => UserPolicy::class,
+        Role::class => RolePolicy::class,
+        Profile::class => ProfilePolicy::class,
+        UserEmailChange::class => UserEmailChangePolicy::class,
+        NotificationAlerts::class => NotificationAlertsPolicy::class,
+        Organization::class => OrganizationPolicy::class,
+        OrganizationMember::class => OrganizationMemberPolicy::class,
     ],
 
     /**
@@ -59,13 +81,12 @@ return [
      */
     'observersToRegister' => [
         // base
-        \App\Models\User::class => \IOF\DiscreteApi\Base\Observers\UserObserver::class,
-        \IOF\DiscreteApi\Base\Models\UserEmailChange::class => \IOF\DiscreteApi\Base\Observers\UserEmailChangeObserver::class,
-        \IOF\DiscreteApi\Base\Models\NotificationAlerts::class => \IOF\DiscreteApi\Base\Observers\NotificationAlertsObserver::class,
-        \IOF\DiscreteApi\Base\Models\Organization::class => \IOF\DiscreteApi\Base\Observers\OrganizationObserver::class,
-        \IOF\DiscreteApi\Base\Models\OrganizationMember::class => \IOF\DiscreteApi\Base\Observers\OrganizationMemberObserver::class,
-        \IOF\DiscreteApi\Base\Models\Profile::class => \IOF\DiscreteApi\Base\Observers\ProfileObserver::class,
-        \IOF\DiscreteApi\Base\Models\Workspace::class => \IOF\DiscreteApi\Base\Observers\WorkspaceObserver::class,
+        User::class => UserObserver::class,
+        UserEmailChange::class => UserEmailChangeObserver::class,
+        NotificationAlerts::class => NotificationAlertsObserver::class,
+        Organization::class => OrganizationObserver::class,
+        OrganizationMember::class => OrganizationMemberObserver::class,
+        Profile::class => ProfileObserver::class,
     ],
 
     /**
@@ -90,7 +111,19 @@ return [
             8 => 'moderator',
             9 => 'admin',
             10 => 'owner',
-        ]
+        ],
+        /**
+         * name for routes relations and field names
+         *
+         * possible variants: groups | teams | projects | organizations
+         *
+         *     WARNING          !WARNING          !WARNING
+         *
+         *     DO NOT CHANGE AFTER MIGRATION IMPLEMENTATION !
+         *     AFFECTS TO `profiles` TABLE AND RELATION NAMES !
+         */
+        'plural_name' => Str::plural('organization'),
+        'singular_name' => Str::singular('organization'),
     ],
 
     /**

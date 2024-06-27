@@ -52,10 +52,6 @@ class UserUpdateAction extends UserUpdateContract
             }
             //
             $saveFlag = false;
-            if (! empty($input['name']) && $input['name'] != $User->name) {
-                $User->name = $input['name'];
-                $saveFlag = true;
-            }
             if (! empty($input['public_name']) && $input['public_name'] != $User->public_name) {
                 $User->public_name = $input['public_name'];
                 $saveFlag = true;

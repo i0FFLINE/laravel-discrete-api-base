@@ -7,31 +7,22 @@ use App\Models\User;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
-use URL;
+use Illuminate\Support\Facades\URL;
 
 class ChangeEmailOldNotification extends Notification
 {
     public User $User;
 
-    /**
-     * Create a new notification instance.
-     */
     public function __construct(User $User)
     {
         $this->User = $User;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     */
     public function via(): array|string
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(mixed $notifiable): ?MailMessage
     {
         $change = $this->User->emailChanges()->latest()->first();
@@ -48,9 +39,6 @@ class ChangeEmailOldNotification extends Notification
         return null;
     }
 
-    /**
-     * Build the mail representation of the notification.
-     */
     protected function buildMailMessage(string $url): ?MailMessage
     {
         $change = $this->User->emailChanges()->latest()->first();

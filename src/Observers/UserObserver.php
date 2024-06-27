@@ -17,10 +17,11 @@ class UserObserver
 
     public function created(User $model): void
     {
-        // INIT
-        $profile = [];
+        // LOCALE
+        $profile['locale'] = DiscreteApiHelper::compute_locale();
         // ROLE
         if (User::all()->count() == 1) {
+            // first user always root admin
             $model->assignRole(config('discreteapibase.roles.super_role'));
             $model->assignRole(config('discreteapibase.roles.admin_role'));
             $model->assignRole(config('discreteapibase.roles.support_role'));
@@ -28,20 +29,16 @@ class UserObserver
         } else {
             $model->assignRole(config('discreteapibase.roles.default_role'));
         }
-        // ORGANIZATION (IF ENABLED)
-        $Organization = DiscreteApiHelper::new_organization($model);
-        if (!is_null($Organization)) {
-            $profile['organization_id'] = $Organization->id;
-            $profile['workspace_id'] = $Organization->workspaces()->first()->id;
+        // ORGANIZATION
+        if (config('discreteapibase.features.organizations') === true) {
+            $Organization = DiscreteApiHelper::new_organization($model);
+            if (!is_null($Organization)) {
+                $profile[config('discreteapibase.organization.singular_name') . '_id'] = $Organization->id;
+            }
         }
-        // FIRST-TIME LOCALE
-        $headers_locale = request()->headers->get('Accept-Language', 'en');
-        if (!is_null($headers_locale) && in_array($headers_locale, array_keys(config('discreteapibase.locales')))) {
-            $profile['locale'] = $headers_locale;
-        }
-        // PROFILE (IF ENABLED)
+        // PROFILE
         if (config('discreteapibase.features.profile') === true) {
-            $model->profile()->create($profile);
+            DiscreteApiHelper::create_user_profile($model, $profile);
         }
     }
 }

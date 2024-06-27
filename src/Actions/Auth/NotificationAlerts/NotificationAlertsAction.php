@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use IOF\DiscreteApi\Base\Contracts\Auth\User\NotificationAlerts\NotificationAlertsContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\NotificationAlerts\NotificationAlertsContract;
 use IOF\DiscreteApi\Base\Models\NotificationAlerts;
 
 class NotificationAlertsAction extends NotificationAlertsContract

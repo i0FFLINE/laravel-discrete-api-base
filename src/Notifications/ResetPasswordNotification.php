@@ -10,25 +10,16 @@ class ResetPasswordNotification extends Notification
 {
     public string $token;
 
-    /**
-     * Create a new notification instance.
-     */
     public function __construct($token)
     {
         $this->token = $token;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     */
     public function via(): array|string
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(mixed $notifiable): MailMessage
     {
         $url = config('discreteapibase.frontend_url')
@@ -40,9 +31,6 @@ class ResetPasswordNotification extends Notification
         return $this->buildMailMessage($url);
     }
 
-    /**
-     * Build the mail representation of the notification.
-     */
     protected function buildMailMessage(string $url): MailMessage
     {
         return (new MailMessage())

@@ -38,18 +38,8 @@ return new class () extends Migration {
             $table->softDeletes();
             $table->unique(['organization_id', 'user_id']);
         });
-        Schema::create('workspaces', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('organization_id')->index()->references('id')->on('organizations')->cascadeOnDelete();
-            $table->integer(Sorter::FIELD)->index()->default(1);
-            $table->string('title')->index();
-            $table->text('description')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
         Schema::table('profiles', function (Blueprint $table) {
-            $table->foreignUuid('organization_id')->nullable()->index()->references('id')->on('organizations')->nullOnDelete();
-            $table->foreignUuid('workspace_id')->nullable()->index()->references('id')->on('workspaces')->nullOnDelete();
+            $table->foreignUuid(config('discreteapibase.organization.singular_name') . '_id')->nullable()->index()->references('id')->on('organizations')->nullOnDelete();
         });
     }
 
@@ -60,10 +50,7 @@ return new class () extends Migration {
     {
         Schema::table('profiles', function (Blueprint $table) {
             $table->dropColumn('organization_id');
-            $table->dropColumn('workspace_id');
         });
-        Schema::dropIfExists('workspaces');
-        Schema::dropIfExists('organizations_invites');
         Schema::dropIfExists('organizations_members');
         Schema::dropIfExists('organizations');
     }

@@ -14,12 +14,9 @@ class OrganizationUpdateController extends DiscreteApiController
 {
     public function __invoke(Request $request, string $id = null): JsonResponse|Response
     {
-        if (!is_null($id) && !Str::isUuid($id)) {
+        if (is_null($id) || !Str::isUuid($id)) {
             return response()->noContent(404);
         }
-        if (!is_null($id)) {
-            return app(OrganizationUpdateContract::class)->do($request->user(), Organization::findOrFail($id), $request->only(['title', 'description']));
-        }
-        return response()->noContent(404);
+        return app(OrganizationUpdateContract::class)->do($request->user(), Organization::findOrFail($id), $request->only(['title', 'description']));
     }
 }

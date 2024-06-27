@@ -14,12 +14,9 @@ class NotificationReadAlertsController extends DiscreteApiController
 {
     public function __invoke(Request $request, string $id = null): JsonResponse|Response
     {
-        if (!is_null($id) && !Str::isUuid($id)) {
+        if (is_null($id) || !Str::isUuid($id)) {
             return response()->noContent(404);
         }
-        if (!is_null($id)) {
-            return app(NotificationReadAlertsContract::class)->do($request->user(), NotificationAlerts::findOrFail($id));
-        }
-        return response()->noContent(404);
+        return app(NotificationReadAlertsContract::class)->do($request->user(), NotificationAlerts::findOrFail($id));
     }
 }

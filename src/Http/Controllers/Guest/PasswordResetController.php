@@ -11,13 +11,6 @@ class PasswordResetController extends DiscreteApiController
 {
     public function __invoke(Request $request): JsonResponse
     {
-        return app(PasswordResetContract::class)->do(
-            $request->only([
-                'email',
-                'password',
-                'password_confirmation',
-                'token',
-            ])
-        );
+        return app(PasswordResetContract::class)->do($request->only(['email', 'password', 'password_confirmation', 'token']));
     }
 }

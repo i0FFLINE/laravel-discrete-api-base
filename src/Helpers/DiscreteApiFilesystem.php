@@ -24,7 +24,7 @@ class DiscreteApiFilesystem
         }
     }
 
-    protected static function check_disk(mixed $model): string
+    public static function check_disk(mixed $model): string
     {
         if (method_exists($model, 'getImageDisk')) {
             return $model->getImageDisk();

@@ -12,6 +12,7 @@ trait HasRoles
      * Assign the Role (by name) to the User
      *
      * @param string $role
+     *
      * @return Model|null
      */
     public function assignRole(string $role): ?Model
@@ -34,10 +35,11 @@ trait HasRoles
     /**
      * check if User has Role (by array of names)
      *
-     * @param mixed $role
+     * @param array|string|int $role
+     *
      * @return boolean
      */
-    public function hasRole(mixed $role): bool
+    public function hasRole(array|string|int $role): bool
     {
         if (is_array($role)) {
             if ($this->roles->count()) {
@@ -47,10 +49,10 @@ trait HasRoles
                     }
                 }
             }
-        } else {
-            if ($this->roles->count()) {
-                return $this->roles->contains('name', $role);
-            }
+        } elseif (is_string($role) && $this->roles->count()) {
+            return $this->roles->contains('name', $role);
+        } elseif (is_numeric($role)) {
+            return $this->roles->contains('id', $role);
         }
         return false;
     }

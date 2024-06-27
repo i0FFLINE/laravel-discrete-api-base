@@ -22,4 +22,9 @@ return [
     'Your personal organization, but you can invite new members into the organization to share content.' => 'Your personal organization, but you can invite new members into the organization to share content.',
     'Personal workspace' => 'Personal workspace',
     'Your personal workspace. You will share content if organization has invited members' => 'Your personal workspace. You will share content if organization has invited members',
+    'You are receiving this email because we received a authentication request for your account' => 'You are receiving this email because we received a authentication request for your account',
+    'Because two-factor authentication is enabled on your account, we send you a one-time secret code for authentication' => 'Because two-factor authentication is enabled on your account, we send you a one-time secret code for authentication',
+    'Login' => 'Login',
+    'Two-factor authentication required' => 'Two-factor authentication required',
+
 ];

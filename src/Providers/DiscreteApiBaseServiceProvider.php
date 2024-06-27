@@ -8,16 +8,17 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use IOF\DiscreteApi\Base\Console\Commands\AssignUserRoleCommand;
 use IOF\DiscreteApi\Base\Contracts\Auth\NotificationAlerts\NotificationAlertsContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\NotificationAlerts\NotificationReadAlertsContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\Organizations\OrganizationCreateContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\Organizations\OrganizationsContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\Organizations\OrganizationSwitchContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\Organizations\OrganizationUpdateContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\Profile\ProfileAvatarUpdateContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\Profile\ProfileUpdateContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\User\LogoutContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\User\User2faContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\User\UserChangeEmailContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\User\UserDeleteContract;
 use IOF\DiscreteApi\Base\Contracts\Auth\User\UserUpdateContract;
@@ -28,11 +29,8 @@ use IOF\DiscreteApi\Base\Contracts\Guest\RegisterContract;
 use IOF\DiscreteApi\Base\Helpers\DiscreteApiHelper;
 use IOF\DiscreteApi\Base\Http\Middleware\PreloadUserData;
 use IOF\DiscreteApi\Base\Http\Middleware\SetLocale;
-use IOF\DiscreteApi\Base\Models\NotificationAlerts;
-use IOF\DiscreteApi\Base\Models\Organization;
 use IOF\DiscreteApi\Base\Models\PersonalAccessToken;
 use IOF\DiscreteApi\Base\Models\Role;
-use IOF\DiscreteApi\Base\Models\Workspace;
 use Laravel\Sanctum\Sanctum;
 
 class DiscreteApiBaseServiceProvider extends ServiceProvider
@@ -61,9 +59,6 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         $this->configureActions();
     }
 
-    /**
-     * Verification Email Customization
-     */
     protected function modifyVerificationEmailNotification(): void
     {
         VerifyEmail::createUrlUsing(function ($notifiable) {
@@ -75,9 +70,6 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Configures a poblishes
-     */
     protected function configurePublishing(): void
     {
         if ($this->app->runningInConsole()) {
@@ -101,9 +93,6 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Configure the commands offered by the application.
-     */
     protected function configureCommands(): void
     {
         if (app()->runningInConsole()) {
@@ -113,9 +102,6 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Configure the routes offered by the application.
-     */
     protected function configureRoutes(): void
     {
         $parsed = DiscreteApiHelper::detail_url(config('app.url', 'http://localhost'));
@@ -128,9 +114,6 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Configure Policies
-     */
     protected function configurePolicies(): void
     {
         if (config('discreteapibase.policiesToRegister', [])) {
@@ -140,9 +123,6 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Configure Observers
-     */
     protected function configureObservers(): void
     {
         foreach (config('discreteapibase.observersToRegister') as $Model => $Observer) {
@@ -167,6 +147,7 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         $this->app->singleton(UserDeleteContract::class, $actions_namespace . 'Auth\\User\\UserDeleteAction');
         $this->app->singleton(UserUpdateContract::class, $actions_namespace . 'Auth\\User\\UserUpdateAction');
         $this->app->singleton(UserChangeEmailContract::class, $actions_namespace . 'Auth\\User\\UserChangeEmailAction');
+        $this->app->singleton(User2faContract::class, $actions_namespace . 'Auth\\User\\User2faAction');
         // Auth\NotificationAlerts Actions
         $this->app->singleton(NotificationAlertsContract::class, $actions_namespace . 'Auth\\NotificationAlerts\\NotificationAlertsAction');
         $this->app->singleton(NotificationReadAlertsContract::class, $actions_namespace . 'Auth\\NotificationAlerts\\NotificationReadAlertsAction');
@@ -177,5 +158,6 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
         $this->app->singleton(OrganizationsContract::class, $actions_namespace . 'Auth\\Organizations\\OrganizationsAction');
         $this->app->singleton(OrganizationCreateContract::class, $actions_namespace . 'Auth\\Organizations\\OrganizationCreateAction');
         $this->app->singleton(OrganizationUpdateContract::class, $actions_namespace . 'Auth\\Organizations\\OrganizationUpdateAction');
+        $this->app->singleton(OrganizationSwitchContract::class, $actions_namespace . 'Auth\\Organizations\\OrganizationSwitchAction');
     }
 }

@@ -21,5 +21,9 @@ return [
     'Personal organization' => 'Личная организация',
     'Your personal organization, but you can invite new members into the organization to share content.' => 'Ваша частная организация, но вы можете приглашать новых членов в организацию, чтобы делиться содержимым.',
     'Personal workspace' => 'Личное рабочее пространство',
-    'Your personal workspace. You will share content if organization has invited members' => 'ше личное рабочее пространство. Вы будете делиться содержимым, если организация пригласила участников.',
+    'Your personal workspace. You will share content if organization has invited members' => 'Ваше личное рабочее пространство. Вы будете делиться содержимым, если организация пригласила участников.',
+    'You are receiving this email because we received a authentication request for your account' => 'Вы получили это письмо, потому что мы получили запрос на аутентификацию вашей учетной записи',
+    'Because two-factor authentication is enabled on your account, we send you a one-time secret code for authentication' => 'Поскольку на вашем аккаунте включена двухфакторная аутентификация, мы отправляем вам одноразовый секретный код для аутентификации',
+    'Login' => 'Login',
+    'Two-factor authentication required' => 'Требуется двух-факторная проверка',
 ];

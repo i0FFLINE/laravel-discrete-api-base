@@ -16,11 +16,12 @@ return new class () extends Migration {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->boolean('is_banned')->index()->default(false);
-            $table->string('name')->index();
             $table->string('public_name', 12)->index();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('two_factor_enabled')->index()->default(false)->nullable();
+            $table->string('two_factor_secret')->index()->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

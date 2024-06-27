@@ -26,6 +26,8 @@ Route::middleware(['auth:sanctum'])->prefix('auth')->group(function () {
         Route::get('/', 'Auth\\User\\UserController');
         // update user
         Route::put('/', 'Auth\\User\\UserUpdateController');
+        // update user's two-factor option
+        Route::put('/2fa', 'Auth\\User\\User2faController');
         // logout
         Route::post('/logout', 'Auth\\User\\LogoutController')->name('logout');
         // password confirmation
@@ -71,7 +73,8 @@ Route::middleware(['auth:sanctum'])->prefix('auth')->group(function () {
 
         // organizations
         if (config('discreteapibase.features.organizations', false) === true) {
-            Route::prefix('organizations')->group(function () {
+            $names = config('discreteapibase.organization.plural_name');
+            Route::prefix($names)->group(function () {
                 // create organization
                 Route::put('/', 'Auth\\Organizations\\OrganizationCreateController');
                 // get my organization
@@ -82,6 +85,8 @@ Route::middleware(['auth:sanctum'])->prefix('auth')->group(function () {
                 Route::delete('/{id}', 'Auth\\Organizations\\OrganizationDeleteController');
                 // list my organizations
                 Route::get('/', 'Auth\\Organizations\\OrganizationsController');
+                // switch organization
+                Route::put('/switch/{id}', 'Auth\\Organizations\\OrganizationSwitchController');
             });
         }
     });

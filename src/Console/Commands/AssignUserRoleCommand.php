@@ -4,6 +4,7 @@ namespace IOF\DiscreteApi\Base\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
+use IOF\DiscreteApi\Base\Models\Role;
 
 class AssignUserRoleCommand extends Command
 {

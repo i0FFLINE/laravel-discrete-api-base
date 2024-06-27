@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
-use IOF\DiscreteApi\Base\Contracts\Auth\User\NotificationAlerts\NotificationReadAlertsContract;
+use IOF\DiscreteApi\Base\Contracts\Auth\NotificationAlerts\NotificationReadAlertsContract;
 use IOF\DiscreteApi\Base\Models\NotificationAlerts;
 
 class NotificationReadAlertsAction extends NotificationReadAlertsContract

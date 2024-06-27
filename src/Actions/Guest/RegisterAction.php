@@ -19,14 +19,12 @@ class RegisterAction extends RegisterContract
             $Validator = Validator::make($input, [
                 'email' => ['required', 'email', 'string', 'max:255', 'unique:users,email'],
                 'password' => ['required', 'string', 'confirmed', (new Password(8))->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
-                'name' => ['required', 'string','max:255'],
             ]);
             if ($Validator->fails()) {
                 return response()->json(['errors' => $Validator->errors()->toArray()], 404);
             }
             $User = User::create([
                 'email' => $input['email'],
-                'name' => $input['name'],
                 'password' => Hash::make($input['password']),
                 'public_name' => DiscreteApiHelper::generate_unique_public_user_name(),
             ]);

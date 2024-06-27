@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use IOF\DiscreteApi\Base\Models\Organization;
 
-abstract class OrganizationUpdateContract
+abstract class OrganizationSwitchContract
 {
-    abstract public function do(User $User, Organization $Organization, array $input = []): Response|JsonResponse|null;
+    abstract public function do(User $User, Organization $Organization): Response|JsonResponse|null;
 }

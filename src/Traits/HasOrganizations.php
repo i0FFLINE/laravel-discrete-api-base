@@ -8,15 +8,10 @@ use IOF\DiscreteApi\Base\Models\Organization;
 use IOF\DiscreteApi\Base\Models\OrganizationMember;
 
 /**
- * USE ONLY IN User MODEL !
+ * FOR User MODEL ONLY
  */
 trait HasOrganizations
 {
-    public function organizations(): BelongsToMany
-    {
-        return $this->belongsToMany(Organization::class, 'organizations_members', 'user_id')->withPivot(['role']);
-    }
-
     public function role(): ?string
     {
         if (isset($this->pivot)) {
@@ -31,4 +26,23 @@ trait HasOrganizations
         return $this->hasMany(OrganizationMember::class, 'user_id');
     }
 
+    public function groups(): BelongsToMany
+    {
+        return $this->organizations();
+    }
+
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'organizations_members', 'user_id')->withPivot(['role']);
+    }
+
+    public function teams(): BelongsToMany
+    {
+        return $this->organizations();
+    }
+
+    public function projects(): BelongsToMany
+    {
+        return $this->organizations();
+    }
 }

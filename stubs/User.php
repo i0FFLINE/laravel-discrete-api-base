@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use IOF\DiscreteApi\Base\Models\BaseUser;
+
 /**
  * @inheritDoc
  */
-class User extends \IOF\DiscreteApi\Base\Models\BaseUser
+class User extends BaseUser
 {
 }

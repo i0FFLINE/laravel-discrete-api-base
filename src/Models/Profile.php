@@ -8,82 +8,40 @@ use Illuminate\Support\Facades\Storage;
 use IOF\DiscreteApi\Base\Helpers\DiscreteApiFilesystem;
 use IOF\DiscreteApi\Base\Traits\BelongsToOrganization;
 use IOF\DiscreteApi\Base\Traits\BelongsToUser;
-use IOF\DiscreteApi\Base\Traits\BelongsToWorkspace;
 
 /**
- * @property string $id
  * @property string $user_id
- * @property string $locale
  * @property string $firstname
  * @property string $lastname
  * @property string $avatar_path
- * @property string $organization_id
- * @property string $workspace_id
- * @method static where(string $key, mixed $val)
+ * @property string $locale
  */
 class Profile extends Model
 {
     use BelongsToUser;
     use BelongsToOrganization;
-    use BelongsToWorkspace;
 
     public $timestamps = false;
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
     public $incrementing = false;
-    /**
-     * The "type" of the primary key ID.
-     *
-     * @var string
-     */
     protected $keyType = 'string';
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'profiles';
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'user_id',
-        'locale',
-        'firstname',
-        'lastname',
-        'avatar_path',
-        'organization_id',
-        'workspace_id',
-    ];
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    protected $fillable = [];
     protected $hidden = ['id', 'user_id'];
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [];
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array
-     */
     protected $appends = ['avatar_url'];
-    /**
-     * The relationships that should be touched on save.
-     *
-     * @var array
-     */
     protected $touches = ['user'];
+
+    public function getFillable(): array
+    {
+        return [
+            'user_id',
+            'locale',
+            'firstname',
+            'lastname',
+            'avatar_path',
+            config('discreteapibase.organization.singular_name') . '_id',
+        ];
+    }
 
     public function getIncrementing(): bool
     {
@@ -117,7 +75,7 @@ class Profile extends Model
         if (is_null($this->avatar_path)) {
             return;
         }
-        Storage::disk($this->avatarDisk())->delete($this->avatar_path);
+        Storage::disk(DiscreteApiFilesystem::check_disk($this))->delete($this->avatar_path);
         $this->forceFill([
             'avatar_path' => null,
         ])->save();
