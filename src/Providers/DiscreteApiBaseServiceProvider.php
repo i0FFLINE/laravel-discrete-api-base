@@ -130,10 +130,12 @@ class DiscreteApiBaseServiceProvider extends ServiceProvider
 
     protected function configureObservers(): void
     {
-        foreach (config('discreteapibase.observersToRegister') as $Model => $Observer) {
-            if (class_exists($Model) && class_exists($Observer)) {
-                /** @noinspection PhpUndefinedMethodInspection */
-                $Model::observe($Observer);
+        if (config('discreteapibase.observersToRegister', [])) {
+            foreach (config('discreteapibase.observersToRegister') as $Model => $Observer) {
+                if (class_exists($Model) && class_exists($Observer)) {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $Model::observe($Observer);
+                }
             }
         }
     }
