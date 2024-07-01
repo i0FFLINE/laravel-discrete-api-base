@@ -43,7 +43,7 @@ return [
         'email_verification' => true,
         'user_delete' => true,
         'organizations' => true,
-        '2fa' => 'email', // email | google | false
+        '2fa' => \IOF\DiscreteApi\Base\TwoFactorAuthProviders\Email2FAProvider::class
     ],
 
     /**

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator;
 use IOF\DiscreteApi\Base\Contracts\Guest\AuthenticateContract;
 use IOF\DiscreteApi\Base\Notifications\TwoFactorSecretNotification;
+use IOF\DiscreteApi\Base\TwoFactorAuthProviders\TwoFAProviderInterface;
 
 class AuthenticateAction extends AuthenticateContract
 {
@@ -27,19 +28,21 @@ class AuthenticateAction extends AuthenticateContract
             $User = User::where('email', $input['email'])->where('is_banned', false)->first();
             if (!is_null($User) && Hash::check($input['password'], $User->password)) {
                 $User->tokens()->delete();
-                if ($User->two_factor_enabled) {
+                $TwofaProvider = config('discreteapibase.features.2fa');
+                $TFA = new $TwofaProvider();
+                if ($User->two_factor_enabled && $TFA instanceof TwoFAProviderInterface) {
                     if (is_null($User->two_factor_secret)) {
                         // make two-factor secret and mail user
                         $User->notify(new TwoFactorSecretNotification($User));
                         return response()->json(['message' => Lang::get('Two-factor authentication required')], 201);
-                    } elseif (!empty($input['code']) && Hash::check($input['code'], $User->two_factor_secret)) {
+                    } elseif (!empty($input['code']) && $TFA->checkSecret($User, $input['code'])) {
                         // check secret and return token
-                        $User->forceFill(['two_factor_secret' => null])->save();
+                        $TFA->resetSecret($User);
                         // и отдаём токен, все счастливы.
                         return response()->json(['token' => $User->createToken('browser', ['*'])->plainTextToken], 201);
                     }
                     // reset secret and return unauth
-                    $User->forceFill(['two_factor_secret' => null])->save();
+                    $TwofaProvider->resetSecret($User);
                     return response()->json([
                         'errors' => [
                             Lang::get('The given data was invalid. Perhaps an incomplete two-factor login. In that case, it iss not an error.')
@@ -49,15 +52,7 @@ class AuthenticateAction extends AuthenticateContract
                     return response()->json(['token' => $User->createToken('browser', ['*'])->plainTextToken], 201);
                 }
             }
-            // ж.о.п.а.
             return response()->noContent(404);
-            /**
-             * RETURNS:
-             *      201+message = 2fa required
-             *      201+token   = OK
-             *      404+errors  = wrong login data
-             *      empty 404   = user not found
-             */
         }
 
         return null;
