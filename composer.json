@@ -1,6 +1,6 @@
 {
   "name": "ioffline/laravel-discrete-api-base",
-  "description": "Laravel API for discrete Frontend. Supports Sanctum token authentication. Inscludes: register, authenticate, logout, reset password, email verification and profile/avatar support.",
+  "description": "Laravel API for discrete Frontend. Supports Sanctum token authentication.",
   "keywords": [
     "laravel",
     "discrete api",
