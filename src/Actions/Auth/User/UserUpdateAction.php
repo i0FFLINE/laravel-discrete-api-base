@@ -19,7 +19,6 @@ class UserUpdateAction extends UserUpdateContract
             $Validator = Validator::make($input, [
                 'current_password' => ['required', 'string', new MatchCurrentPasswordRule()],
                 'email' => ['email', 'string', 'max:255'],
-                'name' => ['required', 'string', 'max:255'],
                 'public_name' => ['required', 'string', 'max:12', 'min:6'],
                 'password' => [
                     'string',
@@ -52,7 +51,7 @@ class UserUpdateAction extends UserUpdateContract
             }
             //
             $saveFlag = false;
-            if (! empty($input['public_name']) && $input['public_name'] != $User->public_name) {
+            if (config('discreteapibase.features.public_name_change', false) && ! empty($input['public_name']) && $input['public_name'] != $User->public_name) {
                 $User->public_name = $input['public_name'];
                 $saveFlag = true;
             }

@@ -32,6 +32,8 @@ Route::middleware(['auth:sanctum'])->prefix('auth')->group(function () {
         Route::post('/logout', 'Auth\\User\\LogoutController')->name('logout');
         // password confirmation
         Route::put('/confirm-password', 'Auth\\User\\UserConfirmPasswordController');
+        // generate public name
+        Route::middleware(['throttle:6,1'])->put('/generate-public-name', 'Auth\\User\\UserPublicNameController');
         // delete user
         if (config('discreteapibase.features.user_delete', false) === true) {
             Route::delete('/', 'Auth\\User\\UserDeleteController');
@@ -70,7 +72,6 @@ Route::middleware(['auth:sanctum'])->prefix('auth')->group(function () {
             // make notification read
             Route::put('/{id?}', 'Auth\\NotificationAlerts\\NotificationReadAlertsController');
         });
-
         // organizations
         if (config('discreteapibase.features.organizations', false) === true) {
             $names = config('discreteapibase.organization.plural_name');

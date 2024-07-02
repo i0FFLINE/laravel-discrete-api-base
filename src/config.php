@@ -43,7 +43,8 @@ return [
         'email_verification' => true,
         'user_delete' => true,
         'organizations' => true,
-        '2fa' => \IOF\DiscreteApi\Base\TwoFactorAuthProviders\Email2FAProvider::class
+        'public_name_change' => true,
+        '2fa' => \IOF\DiscreteApi\Base\TwoFactorAuthProviders\Email2FAProvider::class,
     ],
 
     /**

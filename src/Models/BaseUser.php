@@ -53,13 +53,13 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [
-        'name',
         'email',
         'public_name',
         'password',
         'two_factor_enabled',
         'two_factor_secret',
         'is_banned',
+        'is_elevated',
     ];
     protected $hidden = [
         'password',
@@ -88,7 +88,7 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
 
     public function isConfirmed(): Attribute
     {
-        return Attribute::get(fn () => $this->hasVerifiedEmail());
+        return Attribute::get(fn() => $this->hasVerifiedEmail());
     }
 
     public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null): NewAccessToken
@@ -109,6 +109,8 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'deleted_at' => 'datetime',
+            'is_banned' => 'boolean',
+            'is_elevated' => 'boolean',
         ];
     }
 }
