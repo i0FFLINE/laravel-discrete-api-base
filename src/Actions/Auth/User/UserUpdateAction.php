@@ -19,7 +19,7 @@ class UserUpdateAction extends UserUpdateContract
             $Validator = Validator::make($input, [
                 'current_password' => ['required', 'string', new MatchCurrentPasswordRule()],
                 'email' => ['email', 'string', 'max:255'],
-                'public_name' => ['required', 'string', 'max:12', 'min:6'],
+                'public_name' => ['required', 'string', 'max:12', 'min:4'],
                 'password' => [
                     'string',
                     'confirmed',
@@ -36,30 +36,36 @@ class UserUpdateAction extends UserUpdateContract
                         ->toArray(),
                 ], 404);
             }
-            //
-            if (strlen($input['email'])) {
-                if ($input['email'] != $User->email) {
-                    $User->emailChanges()
-                        ->create([
-                            'old_email' => $User->email,
-                            'old_email_verified_at' => $User->email_verified_at,
-                            'new_email' => $input['email'],
-                            'valid_until' => now()->addHour(),
-                        ]);
-                    $User->notify(new ChangeEmailOldNotification($User));
-                }
+            // EMAIL CHANGE
+            if (strlen($input['email']) && filter_var($input['email'], FILTER_VALIDATE_EMAIL) && $input['email'] != $User->email) {
+                $User->emailChanges()
+                     ->create([
+                         'old_email' => $User->email,
+                         'old_email_verified_at' => $User->email_verified_at,
+                         'new_email' => $input['email'],
+                         'valid_until' => now()->addHour(),
+                     ]);
+                $User->notify(new ChangeEmailOldNotification($User));
             }
             //
             $saveFlag = false;
-            if (config('discreteapibase.features.public_name_change', false) && ! empty($input['public_name']) && $input['public_name'] != $User->public_name) {
-                $User->public_name = $input['public_name'];
+            // PUBLIC NAME CAN CHANGE ONLY ELEVATED USERS
+            if (
+                config('discreteapibase.features.public_name_change', false)
+                && ! empty($input['public_name'])
+                && $input['public_name'] != $User->public_name
+                && $User->is_elevated === true
+            ) {
+                $User->public_name = strtolower($input['public_name']);
                 $saveFlag = true;
             }
+            // PASSWORD CHANGE
             if (! empty($input['password']) && $input['current_password'] != $input['password']) {
                 // save new passord immediatelly
                 $User->forceFill(['password' => Hash::make($input['password'])]);
                 $User->tokens()->delete();
             }
+            // SAVE IF DIRTY
             if ($saveFlag) {
                 $User->save();
             }

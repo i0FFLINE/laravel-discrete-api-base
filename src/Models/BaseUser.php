@@ -23,6 +23,8 @@ use Laravel\Sanctum\NewAccessToken;
 /**
  * @property string $id
  * @property string $email
+ * @property boolean $is_banned
+ * @property boolean $is_elevated
  * @property DateTimeInterface $email_verified_at
  * @property string $name
  * @property string $public_name
