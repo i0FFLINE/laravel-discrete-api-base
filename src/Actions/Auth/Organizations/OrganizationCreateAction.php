@@ -15,20 +15,18 @@ class OrganizationCreateAction extends OrganizationCreateContract
     {
         if (!app()->runningInConsole()) {
             $Validator = Validator::make($input, [
-                'o_title' => ['required', 'string', 'min:3', 'max:255'],
-                'o_description' => ['string', 'string', 'max:16384'],
-                'w_title' => ['required', 'string', 'min:3', 'max:255'],
-                'w_description' => ['string', 'string', 'max:16384'],
+                'title' => ['required', 'string', 'min:3', 'max:255'],
+                'description' => ['string', 'string', 'max:16384'],
             ]);
             if ($Validator->fails()) {
                 return response()->json(['errors' => $Validator->errors()->toArray(),], 404);
             }
-            $Organization = DiscreteApiHelper::new_organization($User, ['title' => $input['o_title'], 'description' => $input['o_description']]);
+            $Organization = DiscreteApiHelper::new_organization($User, ['title' => $input['title'], 'description' => $input['description']]);
             $Organization->load(['membership']);
             $User->profile->forceFill([
                 'organization_id' => $Organization->id,
             ])->save();
-            return response()->noContent();
+            return response()->json($Organization->toArray());
         }
         return null;
     }

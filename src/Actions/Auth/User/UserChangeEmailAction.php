@@ -14,15 +14,18 @@ class UserChangeEmailAction extends UserChangeEmailContract
             $change = $User->emailChanges()->latest()->first();
             if (! is_null($change)) {
                 if ($change->isValid()) {
+                    // fix change email LOG
                     $change->forceFill([
                         'new_email_verified_at' => now(),
                         'deleted_at' => null,
                     ])->save();
+                    // fix user's email
                     $User->forceFill([
                         'email' => $change->new_email,
                         'email_verified_at' => null,
                     ])->save();
-                    $User->emailChanges()->whereNot('id', $change->id)->delete();
+                    // cleanup
+                    $User->emailChanges()->whereNot('id', $change->id)->whereNull('new_email_verified_at')->delete();
                     return response()->json(null, 204);
                 }
             }

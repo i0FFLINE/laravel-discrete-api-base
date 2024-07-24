@@ -18,7 +18,7 @@ class OrganizationDeleteController extends DiscreteApiController
             return response()->noContent(404);
         }
         $Oo = Organization::with(['membership'])->findOrFail($id);
-        (new OrganizationMember())->whereIn('id', $Oo->membership()->whereNotIn('user_id', $Oo->owner_id)->pluck('id')->toArray())->delete();
+        (new OrganizationMember())->whereIn('id', $Oo->membership()->whereNot('user_id', $Oo->owner_id)->pluck('user_id')->toArray())->delete();
         $Oo->delete();
         return response()->noContent();
     }
