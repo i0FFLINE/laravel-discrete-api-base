@@ -15,6 +15,10 @@ use IOF\DiscreteApi\Base\Traits\BelongsToUser;
  * @property string $lastname
  * @property string $avatar_path
  * @property string $locale
+ * @property string $organization_id
+ * @property string $group_id
+ * @property string $team_id
+ * @property string $project_id
  */
 class Profile extends Model
 {
