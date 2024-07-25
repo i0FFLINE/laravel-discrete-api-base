@@ -27,16 +27,16 @@ class DiscreteApiHelper
 
     public static function detail_url(string $url = null): ?array
     {
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        if (! filter_var($url, FILTER_VALIDATE_URL)) {
             return null;
         }
         $parsed = parse_url($url);
-        if (!empty($parsed['query'])) {
+        if (! empty($parsed['query'])) {
             parse_str($parsed['query'], $query);
         } else {
             $query = null;
         }
-        if (!empty($query)) {
+        if (! empty($query)) {
             $parsed['query'] = $query;
         }
         return $parsed;
@@ -48,16 +48,16 @@ class DiscreteApiHelper
             return null;
         }
         $return = $p['scheme'] . '://';
-        if (!empty($p['user'])) {
+        if (! empty($p['user'])) {
             $return .= $p['user'];
-            if (!empty($p['pass'])) {
+            if (! empty($p['pass'])) {
                 $return .= ':' . $p[''] . '@';
             } else {
                 $return .= '@';
             }
         }
         $return .= $p['host'];
-        if (!empty($p['port'])) {
+        if (! empty($p['port'])) {
             $return .= ':' . $p['port'];
         }
         $return .= $p['path'];
@@ -70,7 +70,7 @@ class DiscreteApiHelper
             $return .= $_q . '=' . $_v;
             $x = true;
         }
-        if (!empty($p['fragment'])) {
+        if (! empty($p['fragment'])) {
             $return .= '#' . $p['fragment'];
         }
         return $return;
@@ -85,7 +85,7 @@ class DiscreteApiHelper
                 'description' => empty($o['description']) ? trans('Your personal organization, but you can invite new members into the organization to share content.') : $o['description'],
                 'owner_id' => $User->id,
             ]);
-            if (!is_null($Organization)) {
+            if (! is_null($Organization)) {
                 $Organization->membership()->create([
                     'user_id' => $User->id,
                     'role' => 10,
@@ -97,8 +97,11 @@ class DiscreteApiHelper
         return null;
     }
 
-    public static function in_organization(User $User, Organization $Organization): bool
+    public static function in_organization(User $User, ?Organization $Organization = null): bool
     {
+        if (is_null($Organization)) {
+            return -2;
+        }
         if ($Organization->owner_id == $User->id) {
             return true;
         }
@@ -108,8 +111,11 @@ class DiscreteApiHelper
         return false;
     }
 
-    public static function organization_member_role(User $User, Organization $Organization): ?int
+    public static function organization_member_role(User $User, ?Organization $Organization = null): ?int
     {
+        if (is_null($Organization)) {
+            return -2;
+        }
         if ($Organization->owner_id == $User->id) {
             return 10;
         }
@@ -118,7 +124,7 @@ class DiscreteApiHelper
 
     public static function create_user_profile(User $User, array $input = []): Model|Profile
     {
-        if (!is_null($User->profile)) {
+        if (! is_null($User->profile)) {
             return $User->profile;
         }
 
@@ -149,16 +155,16 @@ class DiscreteApiHelper
     {
         $hl = request()->headers->get('Accept-Language', 'en');
         if (auth()->check()) {
-            if (!is_null(request()->user()->profile) && !is_null(request()->user()->profile->locale) && in_array(request()->user()->profile->locale, array_keys(config('discreteapibase.locales')))) {
+            if (! is_null(request()->user()->profile) && ! is_null(request()->user()->profile->locale) && in_array(request()->user()->profile->locale, array_keys(config('discreteapibase.locales')))) {
                 if (request()->user()->profile->locale != $hl) {
                     request()->user()->profile->forceFill(['locale' => $hl])->save();
                     return $hl;
                 }
                 return request()->user()->profile->locale;
-            } elseif (!is_null($hl) && in_array($hl, array_keys(config('discreteapibase.locales')))) {
+            } elseif (! is_null($hl) && in_array($hl, array_keys(config('discreteapibase.locales')))) {
                 return $hl;
             }
-        } elseif (!is_null(request()->headers->get('Accept-Language', 'en')) && in_array(request()->headers->get('Accept-Language', 'en'), array_keys(config('discreteapibase.locales')))) {
+        } elseif (! is_null(request()->headers->get('Accept-Language', 'en')) && in_array(request()->headers->get('Accept-Language', 'en'), array_keys(config('discreteapibase.locales')))) {
             return request()->headers->get('Accept-Language', 'en');
         }
         return config('app.locale');
