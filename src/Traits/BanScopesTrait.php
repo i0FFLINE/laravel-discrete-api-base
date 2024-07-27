@@ -11,14 +11,14 @@ trait BanScopesTrait
      */
     public function scopeOnlyBanned(Builder $query): void
     {
-        $query->where('is_banned', false);
+        $query->where('is_banned', true);
     }
     /**
      * Only Banned
      */
     public function scopeNotBanned(Builder $query): void
     {
-        $query->where('is_banned', true);
+        $query->where('is_banned', false);
     }
 
 }
