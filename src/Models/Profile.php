@@ -57,21 +57,14 @@ class Profile extends Model
         return 'string';
     }
 
-    public function avatarUrl(): Attribute
+    public function avatarUrl(): ?Attribute
     {
+        if (is_null($this->avatar_path)) {
+            return null;
+        }
         return Attribute::get(function (): ?string {
             return DiscreteApiFilesystem::get_file_url($this, 'avatar_path');
         });
-    }
-
-    public function defaultAvatarUrl(): string
-    {
-        $name = trim(
-            collect(explode(' ', $this->firstname . ' ' . $this->lastname))->map(function ($segment) {
-                return mb_substr($segment, 0, 1);
-            })->join(' ')
-        );
-        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&color=7F9CF5&background=EBF4FF';
     }
 
     public function deleteAvatar(): void
@@ -85,4 +78,13 @@ class Profile extends Model
         ])->save();
     }
 
+    public function defaultAvatarUrl(): string
+    {
+        $name = trim(
+            collect(explode(' ', $this->firstname . ' ' . $this->lastname))->map(function ($segment) {
+                return mb_substr($segment, 0, 1);
+            })->join(' ')
+        );
+        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&color=7F9CF5&background=EBF4FF';
+    }
 }
