@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use IOF\DiscreteApi\Base\Traits\BanScopesTrait;
 use IOF\DiscreteApi\Base\Traits\HasEmailChanges;
 use IOF\DiscreteApi\Base\Traits\HasNotificationAlerts;
 use IOF\DiscreteApi\Base\Traits\HasOrganizations;
@@ -38,6 +39,8 @@ use Laravel\Sanctum\NewAccessToken;
  * @method bool hasRole(array|string|int $role)
  * @method Model|null assignRole(string $role)
  * @method Collection roles()
+ * @method notBanned(Builder $query)
+ * @method onlyBanned(Builder $query)
  * @see Builder
  * @see HasRoles
  */
@@ -51,6 +54,7 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
     use HasNotificationAlerts;
     use HasEmailChanges;
     use HasOrganizations;
+    use BanScopesTrait;
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -101,7 +105,7 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
             'abilities' => $abilities,
         ]);
 
-        return new NewAccessToken($token, $token->getKey() . '|' . $plainTextToken);
+        return new NewAccessToken($token, $token->getKey().'|'.$plainTextToken);
     }
 
     protected function casts(): array
