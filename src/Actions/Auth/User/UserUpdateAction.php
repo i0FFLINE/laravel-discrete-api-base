@@ -39,12 +39,12 @@ class UserUpdateAction extends UserUpdateContract
             // EMAIL CHANGE
             if (strlen($input['email']) && filter_var($input['email'], FILTER_VALIDATE_EMAIL) && $input['email'] != $User->email) {
                 $User->emailChanges()
-                     ->create([
-                         'old_email' => $User->email,
-                         'old_email_verified_at' => $User->email_verified_at,
-                         'new_email' => $input['email'],
-                         'valid_until' => now()->addHour(),
-                     ]);
+                    ->create([
+                        'old_email' => $User->email,
+                        'old_email_verified_at' => $User->email_verified_at,
+                        'new_email' => $input['email'],
+                        'valid_until' => now()->addHour(),
+                    ]);
                 $User->notify(new ChangeEmailOldNotification($User));
             }
             //

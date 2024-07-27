@@ -94,7 +94,7 @@ class BaseUser extends Authenticatable implements MustVerifyEmail
 
     public function isConfirmed(): Attribute
     {
-        return Attribute::get(fn() => $this->hasVerifiedEmail());
+        return Attribute::get(fn () => $this->hasVerifiedEmail());
     }
 
     public function createToken(string $name, array $abilities = ['*'], ?DateTimeInterface $expiresAt = null): NewAccessToken
