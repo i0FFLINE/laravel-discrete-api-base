@@ -32,7 +32,9 @@ class Profile extends Model
     protected $fillable = [];
     protected $hidden = ['id', 'user_id'];
     protected $casts = [];
-    protected $appends = ['avatar_url'];
+    protected $appends = [
+        'avatar_url'
+    ];
     protected $touches = ['user'];
 
     public function getFillable(): array
@@ -57,11 +59,8 @@ class Profile extends Model
         return 'string';
     }
 
-    public function avatarUrl(): ?Attribute
+    public function avatarUrl(): Attribute
     {
-        if (is_null($this->avatar_path)) {
-            return null;
-        }
         return Attribute::get(function (): ?string {
             return DiscreteApiFilesystem::get_file_url($this, 'avatar_path');
         });

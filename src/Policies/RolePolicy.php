@@ -32,14 +32,14 @@ class RolePolicy
 
     public function delete(User $user, Role $role): bool
     {
-        return (!$role->users->count() > 0 && $user->hasRole(['super']))
-            || ($role->is_protected == false && $user->hasRole(['admin']));
+        return !$role->users()->count() > 0
+               && $role->is_protected == false
+               && $user->hasRole(['super', 'admin']);
     }
 
     public function restore(User $user, Role $role): bool
     {
-        return $user->hasRole(['super'])
-            || ($role->is_protected == false && $user->hasRole(['admin']));
+        return $user->hasRole(['super', 'admin']);
     }
 
     public function forceDelete(User $user, Role $role): bool
