@@ -10,7 +10,6 @@ class UserController extends DiscreteApiController
 {
     public function __invoke(Request $request): JsonResponse
     {
-        dd($request->user()->toArray());
         return response()->json($request->user());
     }
 }
