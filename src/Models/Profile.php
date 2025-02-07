@@ -19,6 +19,7 @@ use IOF\DiscreteApi\Base\Traits\BelongsToUser;
  * @property string $group_id
  * @property string $team_id
  * @property string $project_id
+ * @property Organization $organization
  */
 class Profile extends Model
 {

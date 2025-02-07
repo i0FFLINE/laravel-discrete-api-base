@@ -21,6 +21,7 @@ use IOF\DiscreteApi\Base\Policies\ProfilePolicy;
 use IOF\DiscreteApi\Base\Policies\RolePolicy;
 use IOF\DiscreteApi\Base\Policies\UserEmailChangePolicy;
 use IOF\DiscreteApi\Base\Policies\UserPolicy;
+use IOF\DiscreteApi\Base\TwoFactorAuthProviders\Email2FAProvider;
 
 return [
     /**
@@ -44,7 +45,7 @@ return [
         'user_delete' => true,
         'organizations' => true,
         'public_name_change' => true,
-        '2fa' => \IOF\DiscreteApi\Base\TwoFactorAuthProviders\Email2FAProvider::class,
+        '2fa' => Email2FAProvider::class,
     ],
 
     /**
